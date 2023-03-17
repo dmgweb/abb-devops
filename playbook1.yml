@@ -1,0 +1,69 @@
+---
+
+- hosts: localhost
+  gather_facts: no
+  become: true
+  become_method: sudo
+  tasks:
+
+### INSTALL XFCE WITH MODE 1 APT ###
+  - name: install xfce4 minimal packages
+    apt: name="xfce4" state="present"
+    with_items: 
+      - xserver-xorg
+      - xfonts-base
+      - xubuntu-desktop
+      - gdm
+
+### INSTALL CHROMIUM WITH MODE 2 APT ###
+
+  - name: Chromium browser
+    ansible.builtin.apt:
+      name: chromium-browser
+      state: present
+
+### INSTALL DOCKER WITH MODE 1 APT ###
+
+  - name: Install required system packages for Docker
+    apt:
+      pkg:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+        - python3-pip
+        - virtualenv
+        - python3-setuptools
+      state: latest
+      update_cache: true
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu focal stable
+      state: present
+
+  - name: Update apt and install docker-ce
+    apt:
+      name: docker-ce
+      state: latest
+      update_cache: true
+
+ ### GIT PULL SPECIFIC REPO ###     
+
+  - name: GIT pull 
+    git:
+      repo: "{{ hostvars['localhost']['URL_REPO'] }}"
+      dest: docker-abb
+
+
+ ### EXECUTE BASH SCRIPT ###  
+
+  - name: Return motd to registered var
+    ansible.builtin.command: sh docker-abb/check_network.sh
+    register: ps
+  - debug: var=ps.stdout_lines
