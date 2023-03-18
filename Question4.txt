@@ -1,0 +1,28 @@
+4. Networking -Explain how you try to inspect the error in the next case:
+We have a remote user who has an edge machine connected on a VPN with network (192.168.2.0/23)
+using 4G connection with public ip 89.32.42.4. And another interface connected to the factory net-
+work 10.2.3.0/32 . They added one robot and one database sink. The robot is on the factory network
+and the database and the monitoring tool is running on a docker stack the. The user says that he
+added the ip and the database hostname, but the monitoring tool is not storing any data. You have
+access to the VPN and the edge has the port 22 open and you know the user (username: support)
+and password to access
+
+1. Who you connect to the edge
+
+a. what ip range: ??? I think that when you indicate 10.2.3.0/32 as the network address, it should be a host address for the /32
+b. what protocol you should use to connect: SSH
+c. write the linux command or the connection string for this protocol: ssh support@89.32.42.4 
+
+
+2. Write 3 different things you should check
+Docker logs to see that the service started and does not give unexpected errors.
+Ports are open on the firewall? I would check with telnet to 3306 or 5432 if use mysql or postgresql
+traceroute to chek all jumps in network
+
+
+3. Write 5 different error that should happened
+Where has the user added the ip and the hostname? in private dns? file host? The services may not resolve the same as the local computer.
+Does the database user have write permissions?
+Has the variables file in docker-compose for the connections been checked?
+The default route can prevent traffic from flowing through the vpn tunnel interface
+Bad credentians 
